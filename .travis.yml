@@ -1,0 +1,39 @@
+language: scala
+
+scala:
+- 2.12.1
+- 2.11.8
+
+jdk:
+- oraclejdk8
+
+install:
+  - . $HOME/.nvm/nvm.sh
+  - nvm install stable
+  - nvm use stable
+  - npm install
+
+env:
+  global:
+    JSENV=node
+
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION test:fastOptJS test:fullOptJS
+  - sbt ++$TRAVIS_SCALA_VERSION 'set parallelExecution in ThisBuild := false' test
+  - sbt ++$TRAVIS_SCALA_VERSION 'set parallelExecution in ThisBuild := false' 'set scalaJSStage in ThisBuild := FullOptStage' test
+
+
+deploy:
+  provider: script
+  script:
+  - /bin/bash "$TRAVIS_BUILD_DIR/.travis.credentials.sh" && sbt ++$TRAVIS_SCALA_VERSION publish
+  on:
+    tags: true
+
+env:
+  global:
+  # travis encrypt BINTRAY_USER=xxx
+  - secure: "NG2jVi1vjP6hzTloqX9DCoZRRXeORUMbgIIaO0qwJVTwkX3Oc/C1JPPse6L3SzBdOZpJJeYA0B3evF0DfXgfyZNU37GnFxl5JMJPYRM5GWMwTR/zVzmn04iJYSGz6u8kdhiJvUAnmBKVsGV1D1ccKzeby32JX/9Z2kH5mBptQzAAlGaC1QD5uhLQ8v9uGbcS9Sv3rGjlTJmXYD6MDzQP6u3+Gz6LtC33N3cL9AEnvJT9WFoiLpufluNlqgX6BKTLXZI1CInZ0sz489qty2EGRY9RYF3xzv8Zr99z/qvjvW63OVFSOqSmzQT74aZIk02IrsXRoGbNefKzNga4WWvezpmNCYK5cEul2NMJwelvpUwco7eVnzwOUlfzDBHp7qK3eKuhjvf2fyfe/5LAPo3GLJK0/TB0phtkkEVDUg9N+Hc1BMVROyAQzmou4rt9/97tjA75Bn6oa3U9kVoS5/wTvcb3Uct9tEnUNUNT9NNsqlp9YzIHgCoU+Lv7Jgof2wLAUogNZr93mwQVSVhYBCP8Lw0zYatbxBaxKf+AZ9gRVrovK+59LymzKjDU6eDweFdGUOndF6h5hc1jK3gi28IYKEeQZjLI2XE1Tokk6O01zE74rg6ipJN93rffgz4CGzYyzjASl0u5MqEzMqMGGrGCqQY7WdeSKZAM2o7GxmjgwJM="
+  # travis encrypt BINTRAY_PASSWORD=xxx
+  - secure: "K43sP9krO/jbnICx5KKVuqyXtde3gpbxGdv68fcGXLWp6/9xnVUljmuGkNX6e42+Ss8rVDRPBym6S+9lKYkbqPeJu421kTBGpxXSQ+H9NXCqnl3vJFs24WKdMkmtyoGEbPqNSz07CwU3NCuzHgV6dsb1zUVxaaC9ySbQ9Rp3slmP9SO3TgcSBgz08iC1j7WMvV5ctqoCj7P6CFIDTmkiAZEksA8cvYWcnhccT3DGoprYeRJTT2SCn3IylfWeTIN4sNUgWhG9sYjhq+PDpBUgfRG5/1cdhkwMHxNKqXN8bviJFMuwUHyMx5gsKImZPDDPTdBHuSSRy/KfQgeuOH8mnS6Ir0eeN85vda+JeFjehMm8i+ElJWicD8wKsuJa3jA3xwDR9a60NZnIlFJXZmQgbntYSD1E086+GpnUSGzFQGmjhj5EDSGVxDFsrmMSxGUthTvZylku7ZF7vkMYZVK5n6osKl5Wz0TyB1+XrOIBEOcwPyEixpdreFxqovqZW0VgidOGwjWOIt+x4yQCHq7mRi1R3ndSjtUiZVO2nFs8ecshaQTLsGGGq4J+/1RNPrKad9yNnpph8hf0acvOIL4vUi9/TCxVTf3D0wX3tufMH4E1zy8ZbQjpjfL+wlxGLKnEKapEKSNwFuo0pvmYRP0JmplvArFc5SSC0Ogu0dv01e0="
+
